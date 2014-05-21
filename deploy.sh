@@ -17,9 +17,12 @@ OUTPUT_FOLDER="_site/"
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
+VERSION="v0.1.1"
+
+# Version
 
 function usage {
-  echo "HistaDeploy. Static site deployment on Amazon Cloudfront."
+  echo "HistaDeploy $VERSION. Static site deployment on Amazon Cloudfront."
   echo ""
   printf "Usage: $0 [-u url] [-p path]\n"
   echo ""
