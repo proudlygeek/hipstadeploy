@@ -1,0 +1,161 @@
+#!/usr/bin/env bash
+
+#
+# HipstaDeploy
+# ~~~~~~~~~~~~
+#
+# A Bash script for deploying stuff on Amazon CloudFront.
+#
+# Copyright: (c) 2014 by Gianluca Bargelli <g.bargelli@gmail.com>
+# License: MIT
+#
+
+COLOR_GREEN="\e[0;32m"
+COLOR_RESET="\e[0m"
+SITE_URL="http://localhost:2368"
+OUTPUT_FOLDER="_site/"
+CHECKMARK_SYMBOL="✔"
+XMARK_SYMBOL="✘"
+COLOR_RED="\e[0;33m"
+
+function usage {
+  echo "HistaDeploy. Static site deployment on Amazon Cloudfront."
+  echo ""
+  printf "Usage: $0 [-u url] [-p path]\n"
+  echo ""
+  echo "Options:"
+  printf "    -h\tShows this screen.\n"
+  printf "    -u\tURL of your website [default: http://localhost:2368].\n"
+  printf "    -o\tOutput folder of the generated static pages [default: _site].\n"
+}
+
+function show_banner {
+  printf '
+%b______  ______               _____       ________             ______
+%b___  / / /__(_)________________  /______ ___  __ \_______________  /__________  __
+%b__  /_/ /__  /___  __ \_  ___/  __/  __ `/_  / / /  _ \__  __ \_  /_  __ \_  / / /
+%b_  __  / _  / __  /_/ /(__  )/ /_ / /_/ /_  /_/ //  __/_  /_/ /  / / /_/ /  /_/ /
+%b/_/ /_/  /_/  _  .___//____/ \__/ \__,_/ /_____/ \___/_  .___//_/  \____/_\__, /
+              /_/                                     /_/                /____/' $(tput setaf 164) $(tput setaf 163) $(tput setaf 162) $(tput setaf 161) $(tput setaf 160)
+  printf $COLOR_RESET
+  echo ""
+  echo "                                           The Amazing Static Site Deploy Script™! "
+  echo "==================================================================================
+  "
+}
+
+function display_green_check {
+  printf $COLOR_GREEN
+  echo "$CHECKMARK_SYMBOL $1"
+  printf $COLOR_RESET
+}
+
+function display_red_check {
+  printf $COLOR_RED
+  echo "$XMARK_SYMBOL $1"
+  printf $COLOR_RESET
+}
+
+function generate_static_site {
+  SECTION_NAME="Generate static files"
+  CMD="wget --recursive \
+       --convert-links \
+       --page-requisites \
+       --no-parent \
+       --directory-prefix $OUTPUT_FOLDER \
+       --no-host-directories $SITE_URL"
+
+  if [[ $(eval $CMD "2>&1 > /dev/null") != 0 && $? != 0 ]]; then
+    display_red_check "$SECTION_NAME"
+    exit 1
+  fi
+
+  display_green_check "$SECTION_NAME"
+}
+
+function remove_assets_version {
+  SECTION_NAME="Rename Assets Version"
+  for f in $(find . -type f | grep "?v=" | uniq)
+  do
+    mv "$f" $(echo "$f" | sed "s/?v=.*//g")
+  done
+
+  display_green_check "$SECTION_NAME"
+}
+
+function rename_links {
+
+  grep -l -R "" * | xargs sed -i".bak" 's/index\.html//'
+  find . -type f | grep "bak$" | xargs rm -rf
+
+  display_green_check "Rename links"
+}
+
+
+function deploy {
+  SECTION_NAME="Deploy to Amazon CloudFront"
+  CMD="s3_website push --headless --site=$OUTPUT_FOLDER"
+
+  echo ""
+  printf "Do you want to deploy your static site on Amazon CloudFront? %b[Y/n]%b: " $(tput setaf 12) ${COLOR_RESET}
+  read DEPLOY
+
+  if [[ "$DEPLOY" = "N" || "$DEPLOY" = "n" ]]; then
+    echo ""
+    display_red_check "$SECTION_NAME"
+    return
+  fi
+
+  if [[ $(eval $CMD "2>&1 > /dev/stdout") != 0 && $? != 0 ]]; then
+    display_red_check "$SECTION_NAME"
+    exit 1
+  fi
+
+  display_green_check "$SECTION_NAME"
+}
+
+function main {
+  START=$(date +%s)
+  show_banner
+  generate_static_site
+  remove_assets_version
+  rename_links
+  deploy
+  END=$(date +%s)
+
+  echo ""
+  echo "=================================================================================="
+  echo ""
+  TOTAL_TIME=$(echo $((END-START)) | awk '{printf "%d:%02d:%02d", $1/3600, ($1/60)%60, $1%60}')
+  printf $COLOR_RED
+  printf "Done!$COLOR_RESET Total time was $TOTAL_TIME\n"
+}
+
+while getopts ":u:o:h" OPT; do
+  case $OPT in
+    h)
+      usage
+      exit 0
+      ;;
+    u)
+      SITE_URL="$OPTARG"
+      ;;
+    o)
+      OUTPUT_FOLDER="$OPTARG"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      usage
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+main
+
+exit 0
