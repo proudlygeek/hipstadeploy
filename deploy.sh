@@ -17,7 +17,7 @@ OUTPUT_FOLDER="_site/"
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
-VERSION="v0.1.1"
+VERSION="v0.1.2"
 
 # Version
 

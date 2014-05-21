@@ -3,7 +3,7 @@ HipstaDeploy
 
 A bash script for *generating* and *deploying* **static websites** on **[Amazon Cloudfront][1]**.
 
-{<1>}![Imgur](http://i.imgur.com/vSmiPIj.gif?1)
+![Imgur](http://i.imgur.com/vSmiPIj.gif?1)
 
 Why this stuff?
 -----------
