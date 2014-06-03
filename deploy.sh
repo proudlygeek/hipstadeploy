@@ -68,7 +68,10 @@ function generate_static_site {
        --directory-prefix $OUTPUT_FOLDER \
        --no-host-directories $SITE_URL"
 
-  if [[ $(eval $CMD "2>&1 > /dev/null") != 0 && $? != 0 ]]; then
+  if [[ $(eval $CMD "2>&1 > /dev/null") != 0 && $? == 8 ]]; then
+    display_red_check "Got some 404 while generating static files."
+    exit 1
+  elif [[ $? == 0 ]]; then
     display_red_check "$SECTION_NAME"
     exit 1
   fi
