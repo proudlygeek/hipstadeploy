@@ -68,7 +68,21 @@ function generate_static_site {
        --directory-prefix $OUTPUT_FOLDER \
        --no-host-directories $SITE_URL"
 
-  if [[ $(eval $CMD "2>&1 > /dev/null") != 0 && $? != 0 ]]; then
+  if [[ $(eval $CMD "2>&1 > /dev/null") != 0 && $? == 8 ]]; then
+    display_red_check "Got some 404 while generating static files."
+    
+    echo ""
+    printf "Do you want to continue? %b[Y/n]%b: " $(tput setaf 12) ${COLOR_RESET}
+    read CHOICE
+
+    if [[ "$CHOICE" = "N" || "$CHOICE" = "n" ]]; then
+      echo ""
+      display_red_check "$SECTION_NAME"
+      show_footer
+      exit 0
+    fi
+
+  elif [[ $? == 0 ]]; then
     display_red_check "$SECTION_NAME"
     exit 1
   fi
@@ -117,6 +131,16 @@ function deploy {
   display_green_check "$SECTION_NAME"
 }
 
+function show_footer {
+  END=$(date +%s)
+  echo ""
+  echo "=================================================================================="
+  echo ""
+  TOTAL_TIME=$(echo $((END-START)) | awk '{printf "%d:%02d:%02d", $1/3600, ($1/60)%60, $1%60}')
+  printf $COLOR_RED
+  printf "Done!$COLOR_RESET Total time was $TOTAL_TIME\n"
+}
+
 function main {
   START=$(date +%s)
   show_banner
@@ -124,14 +148,7 @@ function main {
   remove_assets_version
   rename_links
   deploy
-  END=$(date +%s)
-
-  echo ""
-  echo "=================================================================================="
-  echo ""
-  TOTAL_TIME=$(echo $((END-START)) | awk '{printf "%d:%02d:%02d", $1/3600, ($1/60)%60, $1%60}')
-  printf $COLOR_RED
-  printf "Done!$COLOR_RESET Total time was $TOTAL_TIME\n"
+  show_footer
 }
 
 while getopts ":u:o:h" OPT; do
