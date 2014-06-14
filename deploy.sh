@@ -14,6 +14,7 @@ COLOR_GREEN="\e[0;32m"
 COLOR_RESET="\e[0m"
 SITE_URL="http://localhost:2368"
 OUTPUT_FOLDER="_site/"
+PUBLISH_URL="http://www.oddevan.com"
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
@@ -96,6 +97,8 @@ function remove_assets_version {
   do
     mv "$f" $(echo "$f" | sed "s/?v=.*//g")
   done
+  
+  ./findreplace.rb "$OUTPUT_FOLDER" "$SITE_URL" "$PUBLISH_URL"
 
   display_green_check "$SECTION_NAME"
 }
