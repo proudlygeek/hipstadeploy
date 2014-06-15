@@ -14,7 +14,7 @@ COLOR_GREEN="\e[0;32m"
 COLOR_RESET="\e[0m"
 SITE_URL="http://localhost:2368"
 OUTPUT_FOLDER="_site/"
-PUBLISH_URL="http://www.oddevan.com"
+PUBLISH_URL=""
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
@@ -25,12 +25,13 @@ VERSION="v0.1.2"
 function usage {
   echo "HistaDeploy $VERSION. Static site deployment on Amazon Cloudfront."
   echo ""
-  printf "Usage: $0 [-u url] [-p path]\n"
+  printf "Usage: $0 [-u url] [-p path] [-r remote URL]\n"
   echo ""
   echo "Options:"
   printf "    -h\tShows this screen.\n"
   printf "    -u\tURL of your website [default: http://localhost:2368].\n"
   printf "    -o\tOutput folder of the generated static pages [default: _site].\n"
+  printf "    -r\tURL of remote site (used for RSS feed find/replace) [no default].\n"
 }
 
 function show_banner {
@@ -97,8 +98,6 @@ function remove_assets_version {
   do
     mv "$f" $(echo "$f" | sed "s/?v=.*//g")
   done
-  
-  ./findreplace.rb "$OUTPUT_FOLDER" "$SITE_URL" "$PUBLISH_URL"
 
   display_green_check "$SECTION_NAME"
 }
@@ -109,6 +108,16 @@ function rename_links {
   find . -type f | grep "bak$" | xargs rm -rf
 
   display_green_check "Rename links"
+}
+
+function fix_rss {
+	if [ -n "$PUBLISH_URL" ]; then
+		./findreplace.rb "$OUTPUT_FOLDER" "$SITE_URL" "$PUBLISH_URL"
+	
+		display_green_check "Fixing RSS feed"
+	else
+		display_red_check "Fixing RSS feed (no publish url; skipping)"
+	fi
 }
 
 
@@ -150,11 +159,12 @@ function main {
   generate_static_site
   remove_assets_version
   rename_links
+  fix_rss
   deploy
   show_footer
 }
 
-while getopts ":u:o:h" OPT; do
+while getopts ":u:o:r:h" OPT; do
   case $OPT in
     h)
       usage
@@ -166,6 +176,9 @@ while getopts ":u:o:h" OPT; do
     o)
       OUTPUT_FOLDER="$OPTARG"
       ;;
+    r)
+    	PUBLISH_URL="$OPTARG"
+    	;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       usage
