@@ -67,7 +67,6 @@ function generate_static_site {
        --convert-links \
        --page-requisites \
        --no-parent \
-       --no-clobber \
        --directory-prefix $OUTPUT_FOLDER \
        --no-host-directories $SITE_URL"
 
