@@ -9,7 +9,6 @@ files = Dir.glob("#{outputFolder}rss/*") << Dir.glob("#{outputFolder}rss*") << D
 
 files.each do |file_name|
 	if file_name.kind_of?(String)
-		puts file_name
 		text = File.read(file_name)
 		replace = text.gsub!(localURL, remoteURL)
 		File.open(file_name, "w") { |file| file.puts replace }
