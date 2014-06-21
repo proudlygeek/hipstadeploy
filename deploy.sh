@@ -112,7 +112,7 @@ function rename_links {
 
 function fix_rss {
 	if [ -n "$PUBLISH_URL" ]; then
-		./findreplace.rb "$OUTPUT_FOLDER" "$SITE_URL" "$PUBLISH_URL"
+		ruby -e "files = Dir.glob('$OUTPUT_FOLDER' + 'rss/*') << Dir.glob('$OUTPUT_FOLDER' + 'rss*') << Dir.glob('$OUTPUT_FOLDER' + 'feed/*') << Dir.glob('$OUTPUT_FOLDER' + 'feed*'); files.each { |file_name| if file_name.kind_of?(String) then text = File.read(file_name); replace = text.gsub!('$SITE_URL', '$PUBLISH_URL'); File.open(file_name, 'w') { |file| file.puts replace } end }"
 	
 		display_green_check "Fixing RSS feed"
 	else
