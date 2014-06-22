@@ -18,7 +18,7 @@ PUBLISH_URL=""
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
-VERSION="v0.1.2"
+VERSION="v0.1.3"
 
 # Version
 
@@ -111,12 +111,12 @@ function rename_links {
 }
 
 function fix_rss {
-	if [ -n "$PUBLISH_URL" ]; then
-		ruby -e "files = Dir.glob('$OUTPUT_FOLDER' + 'rss/*') << Dir.glob('$OUTPUT_FOLDER' + 'rss*') << Dir.glob('$OUTPUT_FOLDER' + 'feed/*') << Dir.glob('$OUTPUT_FOLDER' + 'feed*'); files.each { |file_name| if file_name.kind_of?(String) then text = File.read(file_name); replace = text.gsub!('$SITE_URL', '$PUBLISH_URL'); File.open(file_name, 'w') { |file| file.puts replace } end }"
-	
-		display_green_check "Fixing RSS feed"
-	else
-		display_red_check "Fixing RSS feed (no publish url; skipping)"
+  if [ -n "$PUBLISH_URL" ]; then
+    ruby -e "files = Dir.glob('$OUTPUT_FOLDER' + 'rss/*') << Dir.glob('$OUTPUT_FOLDER' + 'rss*') << Dir.glob('$OUTPUT_FOLDER' + 'feed/*') << Dir.glob('$OUTPUT_FOLDER' + 'feed*'); files.each { |file_name| if file_name.kind_of?(String) then text = File.read(file_name); replace = text.gsub!('$SITE_URL', '$PUBLISH_URL'); File.open(file_name, 'w') { |file| file.puts replace } end }"
+
+    display_green_check "Fixing RSS feed"
+  else
+    display_red_check "Fixing RSS feed (no publish url; skipping)"
 	fi
 }
 
