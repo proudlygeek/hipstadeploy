@@ -69,12 +69,18 @@ hipdep
 
 HipstaDeploy will ask you if you want to deploy your static folder to Amazon CloudFront, say **Y** to rock on!
 
-Your static files will be generated from URL **http//localhost:2368** (yes, that's a [Ghost][3] blog) and will be saved in a folder named **_site**. 
+Your static files will be generated from URL **http//localhost:2368** (yes, that's a [Ghost][3] blog) and will be saved in a folder named **_site**.
 
 You can override this behavior by using the **-u** and **-o** flags:
 
 ```bash
 hipdep -u http://blog.local:8080 -o static_file
+```
+
+You can also specifiy your publish URL, which is used for RSS via the **-r** flag:
+
+```bash
+hipdep -r blog.site.com
 ```
 
 License
