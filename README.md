@@ -61,6 +61,16 @@ s3_secret: YOUR_AWS_S3_SECRET_ACCESS_KEY
 s3_bucket: your.blog.bucket.com
 ```
 
+Create a configuration Hipstafile and set your values:
+
+```json
+{
+    "SITE_URL": "http://localhost:2368",
+    "OUTPUT_FOLDER": "_site",
+    "PUBLISH_URL": ""
+}
+```
+
 Now just fire up HipstaDeploy with:
 
 ```bash
