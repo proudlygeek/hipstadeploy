@@ -159,7 +159,9 @@ function show_footer {
 
 function jsonval {
     prop=$1
-    temp1=`echo $CONFIG | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | awk '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w $prop`
+    temp1=`echo $CONFIG | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | \
+            awk '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | \
+            sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -iw $prop`
     temp2=`IFS=':' read -r value string <<< "$temp1"; echo $string`
     echo "${temp2##*|}"
 }
