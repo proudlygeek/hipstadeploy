@@ -23,7 +23,7 @@ VERSION="v0.1.3"
 # Version
 
 function usage {
-  echo "HistaDeploy $VERSION. Static site deployment on Amazon Cloudfront."
+  echo "HipstaDeploy $VERSION. Static site deployment on Amazon Cloudfront."
   echo ""
   printf "Usage: $0 [-u url] [-p path] [-r remote URL]\n"
   echo ""
@@ -72,7 +72,7 @@ function generate_static_site {
 
   if [[ $(eval $CMD "2>&1 > /dev/null") != 0 && $? == 8 ]]; then
     display_red_check "Got some 404 while generating static files."
-    
+
     echo ""
     printf "Do you want to continue? %b[Y/n]%b: " $(tput setaf 12) ${COLOR_RESET}
     read CHOICE
@@ -123,7 +123,7 @@ function fix_rss {
 
 function deploy {
   SECTION_NAME="Deploy to Amazon CloudFront"
-  CMD="s3_website push --headless --site=$OUTPUT_FOLDER"
+  CMD="s3_website push --site=$OUTPUT_FOLDER"
 
   echo ""
   printf "Do you want to deploy your static site on Amazon CloudFront? %b[Y/n]%b: " $(tput setaf 12) ${COLOR_RESET}
@@ -135,10 +135,17 @@ function deploy {
     return
   fi
 
-  if [[ $(eval $CMD "2>&1 > /dev/stdout") != 0 && $? != 0 ]]; then
-    display_red_check "$SECTION_NAME"
-    exit 1
-  fi
+  while IFS= read -r line; do
+      echo $line
+      if [[ $line == ERROR* ]]
+      then
+          echo -e "\n\n"
+          echo "Exiting on s3_website push error."
+          display_red_check "$SECTION_NAME"
+          return
+          exit 0
+      fi
+  done < <($CMD 2>&1)
 
   display_green_check "$SECTION_NAME"
 }
