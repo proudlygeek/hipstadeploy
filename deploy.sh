@@ -15,7 +15,7 @@ COLOR_RESET="\e[0m"
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
-VERSION="v0.1.3"
+VERSION="v0.2.0"
 
 # Version
 
