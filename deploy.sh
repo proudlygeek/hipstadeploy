@@ -12,9 +12,6 @@
 
 COLOR_GREEN="\e[0;32m"
 COLOR_RESET="\e[0m"
-SITE_URL="http://localhost:2368"
-OUTPUT_FOLDER="_site/"
-PUBLISH_URL=""
 CHECKMARK_SYMBOL="✔"
 XMARK_SYMBOL="✘"
 COLOR_RED="\e[0;33m"
@@ -160,8 +157,29 @@ function show_footer {
   printf "Done!$COLOR_RESET Total time was $TOTAL_TIME\n"
 }
 
+function jsonval {
+    prop=$1
+    temp1=`echo $CONFIG | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | \
+            awk '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | \
+            sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -iw $prop`
+    temp2=`IFS=':' read -r value string <<< "$temp1"; echo $string`
+    echo "${temp2##*|}"
+}
+
+function read_config {
+  CONFIG=$(<Hipstafile)
+  SITE_URL=$(jsonval 'SITE_URL')
+  OUTPUT_FOLDER=$(jsonval 'OUTPUT_FOLDER')
+  PUBLISH_URL=$(jsonval 'PUBLISH_URL')
+
+  echo $SITE_URL
+  echo $OUTPUT_FOLDER
+  echo $PUBLISH_URL
+}
+
 function main {
   START=$(date +%s)
+  read_config
   show_banner
   generate_static_site
   remove_assets_version
