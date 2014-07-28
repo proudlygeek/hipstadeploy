@@ -65,9 +65,9 @@ Create a configuration Hipstafile and set your values:
 
 ```json
 {
-    "SITE_URL": "http://localhost:2368",
-    "OUTPUT_FOLDER": "_site",
-    "PUBLISH_URL": ""
+    "site_url": "http://localhost:2368",
+    "output_folder": "_site",
+    "publish_url": ""
 }
 ```
 
